@@ -72,3 +72,8 @@ aerich upgrade
 aerich downgrade
 
 ```
+
+# 生成依赖配置文件
+```shell
+pip freeze > requirements.txt # 生成依赖汇总文件
+```
