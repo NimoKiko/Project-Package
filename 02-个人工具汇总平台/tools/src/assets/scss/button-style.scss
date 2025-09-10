@@ -1,0 +1,75 @@
+// 按钮样式
+@use "./variable.scss" as vars;
+
+
+.el-button {
+  background-color: vars.$transparent-background1;
+  color: vars.$font-color;
+  border: 0;
+  box-shadow: vars.$box-shadow2;
+
+  &:hover {
+    transition: .2s all;
+    background-color: vars.$button-color-blue;
+    color: white;
+    border: 0;
+  }
+}
+// 蓝色按钮
+.view-btn {
+  background-color: vars.$transparent-background1;
+  color: vars.$font-color;
+  border: 0;
+  box-shadow: vars.$box-shadow2;
+
+  &:hover {
+    transition: .2s all;
+    background-color: vars.$button-color-blue;
+    color: white;
+    border: 0;
+  }
+}
+// 绿色按钮
+.download-btn {
+  background-color: vars.$transparent-background1;
+  color: vars.$font-color;
+  border: 0;
+  box-shadow: vars.$box-shadow2;
+
+  &:hover {
+    transition: .2s all;
+    background-color: vars.$button-color-green;
+    color: white;
+    border: 0;
+  }
+}
+// 红色按钮
+.cancel-btn {
+  background-color: rgba(255, 255, 255, 0.695);
+  border: 0;
+  box-shadow: 0 0 8px #636363b3;
+  color: grey;
+  transition: .5s all;
+
+  &:hover {
+    box-shadow: 0 0 8px #525252b3;
+    color: white;
+    transition: .2s all;
+    background-color: vars.$button-color-red;
+  }
+}
+// 灰色按钮
+.dark-btn {
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 0;
+  box-shadow: 0 0 8px #636363b3;
+  color: grey;
+  transition: .5s all;
+
+  &:hover {
+    box-shadow: 0 0 8px #525252b3;
+    color: white;
+    transition: .2s all;
+    background-color: vars.$button-color-grey;
+  }
+}

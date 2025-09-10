@@ -1,0 +1,60 @@
+// 统一样式变量
+// background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);?
+// 背景色1
+$background-color1: linear-gradient(240deg, #84fab0 0%, #8fd3f4 100%);
+// 背景色2
+$background-color2: linear-gradient(to right bottom,
+        #7fffd457,
+        rgba(141, 141, 244, 0.703),
+        #fa807278);
+// 背景色3
+$background-color3: linear-gradient(to left bottom,
+        #7fffd457,
+        rgba(141, 141, 244, 0.703),
+        #fa807278);
+
+// 透明背景样式1
+$transparent-background1: #ffffff9f;
+// 透明背景样式2
+$transparent-background2: #ebebeb46;
+
+// 统一圆角（大圆角）
+$border-radius-big: 15px;
+// 统一圆角（中圆角）
+$border-radius-medium: 8px;
+// 统一圆角（小圆角）
+$border-radius-small: 4px;
+
+// 统一阴影样式1
+$box-shadow1: 0 0 10px #4e4e4eb4;
+// 统一阴影样式2
+$box-shadow2: 0 0 5px #575757b4;
+
+// 标边线样式1
+$border-left1: 4px rgb(95, 149, 255) solid;
+// 标边线样式1
+$border-left2: 4px solid #14eb9e;
+// 文字颜色
+$font-color: #5e5e5e;
+
+$font-color-white: #fff;
+
+// 分隔线样式1
+$separator-color1:1px solid #8a8a8a;
+// 分隔线样式2
+$separator-color2:1px solid #8a8a8ac4;
+
+
+// Header样式
+$header-background-color: #ffffff;
+// Header高度
+$header-height: 60px;
+
+// 按钮颜色
+$button-color-green:#3dc365;
+
+$button-color-blue: #65baef;
+
+$button-color-red: #ef6565;
+
+$button-color-grey: #a6a6a6

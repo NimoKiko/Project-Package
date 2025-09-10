@@ -1,0 +1,177 @@
+// el-table样式
+
+/* 表格样式V2.0 */
+.el-table {
+  width: 92%;
+  margin: 0 auto;
+  background: transparent;
+  font-family: 'JinBuTi';
+  /* position: static; */
+  box-shadow: 0 0 8px #56565680;
+  border-radius: 8px;
+  --el-table-border-color: none;
+
+  &:hover {
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 12px #56565680;
+  }
+}
+
+.el-table::before {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0px;
+}
+
+/* 设置表格行间距 */
+.el-table__body {
+  -webkit-border-vertical-spacing: 10px;
+}
+
+/* 表头部分设置 */
+.el-table .el-table__header {
+  background: linear-gradient(to right bottom, #e7e7e7, #d6fff7a7) !important;
+  /* background: rgb(231, 231, 231) !important; */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 6px;
+
+}
+
+.el-table .el-table__header thead {
+  color: #656565;
+  // border: 0;
+}
+
+.el-table .el-table__header thead tr {
+  background: transparent;
+}
+
+.el-table .el-table__header thead tr th {
+  /* background: #3f3d49; */
+  background: transparent;
+}
+
+.el-table td,
+.el-table th.is-leaf {
+  border: 0;
+}
+
+/* 表头部分 end */
+
+/* 表格部分 */
+.el-table .el-table__body tbody {
+  color: rgb(101, 101, 101);
+}
+
+.el-table .el-table__body tbody>tr {
+  transform: scale(0.98);
+  background: #f8f8f8;
+  border-radius: 5px;
+  transition: 0.5s all;
+  height: 40px;
+  box-shadow: 0 0 6px rgb(155, 155, 155);
+}
+
+.el-table .el-table__body tbody>tr:hover {
+  transform: scale(0.99);
+  /* background: #6d7092 !important; */
+  background: linear-gradient(to right bottom,
+      #84faaf95,
+      #8fd2f4ac) !important;
+}
+
+.el-table .el-table__body tbody>tr td {
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  transition: 0.5s all;
+  padding: 0;
+  
+}
+
+.el-table .el-table__body tbody>tr:hover td {
+  border: 1px solid transparent !important;
+  background: transparent !important;
+}
+
+.el-table .el-table__body tbody>tr td:nth-last-child(1) {
+  border-radius: 0 5px 5px 0;
+}
+
+.el-table .el-table__body tbody>tr td:nth-child(1) {
+  border-radius: 5px 0 0 5px;
+}
+
+/* 滚动条样式 */
+.el-table__body-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background-color: #8f8f8f;
+  border-radius: 3px;
+}
+
+
+/** 警告色设置 */
+.el-table .warning-row {
+  background-color: rgb(241, 230, 209);
+}
+
+.el-table .success-row {
+  background-color: #c4e0b5;
+}
+
+.el-table .error-row {
+  color: #f34949;
+}
+
+/* 表格部分 end */
+
+/* 分页条样式 start */
+.msg-pagination-container {
+  margin-top: 20px;
+  /* border: 1px solid red; */
+  text-align: center;
+}
+
+.el-pagination .el-pager li {
+  /*对页数的样式进行修改*/
+  /* background-color: #10263c; */
+  /* background-color: #3f3d49; */
+  background: linear-gradient(to right bottom,
+      #84faaf95,
+      #8fd2f4ac);
+
+  color: #797979;
+}
+
+.el-pagination .btn-next {
+  /*对下一页的按钮样式进行修改*/
+  /* background-color: #10263c; */
+  background: linear-gradient(to right bottom,
+      #84faaf95,
+      #8fd2f4ac);
+  color: #797979;
+}
+
+.el-pagination .btn-prev {
+  /*对上一页的按钮样式进行修改*/
+  /* background-color: #10263c; */
+  background: linear-gradient(to right bottom,
+      #84faaf95,
+      #8fd2f4ac);
+  color: #797979;
+}
+
+.el-pagination.is-background .btn-next.is-active,
+.el-pagination.is-background .btn-prev.is-active,
+.el-pagination.is-background .el-pager li.is-active {
+  /*对当前页的样式进行修改*/
+  background-color: #05cdff;
+  color: #ffffff;
+}
+
+/* 分页条样式 end */

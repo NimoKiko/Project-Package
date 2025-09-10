@@ -1,0 +1,64 @@
+@use "./variable.scss" as vars;
+
+.el-dialog__header {
+  backdrop-filter: blur(8px);
+  background: #ffffff9f !important;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 8%;
+  padding: 0;
+}
+
+.el-dialog__title {
+  line-height: 24px;
+  font-size: 18px;
+  color: #3b3b3b;
+}
+
+.el-dialog {
+  background: linear-gradient(to right bottom,
+      #7fffd457,
+      rgba(141, 141, 244, 0.466),
+      #fa807278);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  box-shadow: 0 0 8px #525252b3;
+  padding: 0;
+}
+
+.el-dialog__body {
+  height: 92%;
+}
+
+.el-dialog .ok-btn {
+  background-color: rgb(255, 255, 255);
+  border: 0;
+  box-shadow: 0 0 8px #636363b3;
+  color: grey;
+  transition: .5s all;
+
+  &:hover {
+    box-shadow: 0 0 8px #525252b3;
+    color: white;
+    transition: .2s all;
+    background-color: vars.$button-color-green;
+  }
+}
+
+.el-dialog .cancel-btn {
+  background-color: rgba(255, 255, 255, 0.695);
+  border: 0;
+  box-shadow: 0 0 8px #636363b3;
+  color: grey;
+  transition: .5s all;
+
+  &:hover {
+    box-shadow: 0 0 8px #525252b3;
+    color: white;
+    transition: .2s all;
+    background-color: vars.$button-color-red;
+  }
+}

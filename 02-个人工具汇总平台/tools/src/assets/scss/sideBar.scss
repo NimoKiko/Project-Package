@@ -1,0 +1,12 @@
+.el-menu {
+  border: 0;
+  background: transparent;
+}
+
+.el-aside {
+  height: 100%;
+  background: linear-gradient(to top, #a8ede9bd 0%, #fed6e3a8 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 20px 20px 0;
+}
