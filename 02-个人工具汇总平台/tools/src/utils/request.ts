@@ -40,9 +40,9 @@ request.interceptors.request.use((config) => {
   // if (token) {
   //   config.headers["Authorization"] = `Bearer ${token}`;
   // }
-  // if (config.method == "post") {
-  //   // config.headers["Content-Type"] = "application/x-www-form-urlencoded";
-  //   config.headers["Content-Type"] = " application/json";
+  // if (config.method == "POST") {
+  //   config.headers["Content-Type"] = "application/x-www-form-urlencoded";
+  //   config.headers["Content-Type"] = "multipart/form-data";
   // }
 
   return config;

@@ -10,18 +10,20 @@ import uvicorn
 # 注册路由
 from api.User.routes import user
 from api.Audio.routes import audio
+from api.Pdf.routes import pdf
 
 app = FastAPI()
 
 app.include_router(user, prefix="/user", tags=["用户模块"])
 app.include_router(audio, prefix="/audio", tags=["音频处理模块"])
+app.include_router(pdf, prefix="/pdf", tags=["PDF处理模块"])
 
 # 处理跨域的中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins="*",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"]
 )
 
