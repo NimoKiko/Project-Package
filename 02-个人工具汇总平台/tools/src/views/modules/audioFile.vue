@@ -137,7 +137,6 @@ onMounted(() => {
 .Audio-File {
   position: relative;
   // width: 100%;
-  border: 1px solid black;
   display: flex;
   justify-content: center;
 

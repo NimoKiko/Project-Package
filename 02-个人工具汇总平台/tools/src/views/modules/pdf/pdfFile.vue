@@ -30,6 +30,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .PDF-File {
-  border: 1px solid black;
+  // border: 1px solid black;
 }
 </style>
