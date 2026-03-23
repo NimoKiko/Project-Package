@@ -1,0 +1,124 @@
+// Obsidian Command — Upload Zone Styles
+// Shared by audioFile.vue, mergePDF.vue, singlePDF.vue
+
+.upload-zone-wrapper {
+  position: relative;
+  background: var(--bg-card);
+  border: 2px dashed var(--border-active);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base),
+    box-shadow var(--transition-base);
+  animation: glow-pulse 4s ease-in-out infinite;
+  cursor: pointer;
+
+  &:hover,
+  &.is-dragover {
+    border-color: var(--accent);
+    border-style: solid;
+    background: var(--bg-elevated);
+    animation: none;
+    box-shadow:
+      0 0 30px var(--accent-glow),
+      inset 0 0 30px rgba(56, 189, 248, 0.04);
+  }
+
+  .upload-icon-wrap {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+    border-radius: 16px;
+    color: var(--bg-deep);
+    font-size: 26px;
+    animation: subtle-float 3s ease-in-out infinite;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .upload-main-text {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+
+    em {
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 600;
+    }
+  }
+
+  .upload-hint-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  // Reset el-upload internal styles
+  :deep(.el-upload) {
+    width: 100%;
+    display: block;
+  }
+
+  :deep(.el-upload-dragger) {
+    background: transparent;
+    border: none;
+    padding: 0;
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:hover {
+      border-color: transparent;
+      background: transparent;
+    }
+  }
+
+  :deep(.el-upload__tip) {
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  :deep(.el-upload-list) {
+    margin-top: 0;
+
+    .el-upload-list__item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      margin-top: 8px;
+
+      &:hover {
+        background: var(--bg-card);
+        border-color: var(--border-active);
+      }
+    }
+
+    .el-upload-list__item-name {
+      color: var(--text-primary);
+    }
+
+    .el-icon--close {
+      color: var(--text-muted);
+
+      &:hover {
+        color: var(--error);
+      }
+    }
+  }
+}

@@ -1,118 +1,109 @@
 <template>
-  <div class="Audio-File container">
-    <div class="file-upload-wrap">
-      <el-upload class="upload-demo" drag ref="uploadRef" :auto-upload="false" :on-change="handleFileChange"
-        :show-file-list="true" :on-remove="handleFileRemove">
-        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">
-          拖拽到此上传 或 <em>点击上传</em>
-        </div>
-        <template #tip>
-          <div class="el-upload__tip">
-            仅支持 MP3, MP4, OGG, FLAC, WAV格式
+  <div class="audio-tool">
+
+    <!-- Page header -->
+    <div class="tool-header">
+      <h1 class="tool-title">音频转换</h1>
+      <p class="tool-desc">上传音频文件，一键转换为目标格式并下载</p>
+    </div>
+
+    <!-- Upload section -->
+    <div class="tool-section">
+      <div class="section-label">
+        <el-icon><Upload /></el-icon>
+        上传文件
+      </div>
+      <div class="upload-zone-wrapper">
+        <el-upload
+          class="upload-demo"
+          drag
+          ref="uploadRef"
+          :auto-upload="false"
+          :on-change="handleFileChange"
+          :show-file-list="true"
+          :on-remove="handleFileRemove"
+        >
+          <div class="upload-icon-wrap">
+            <el-icon><Headset /></el-icon>
           </div>
-        </template>
-      </el-upload>
+          <div class="upload-main-text">拖拽文件到此处 或 <em>点击上传</em></div>
+          <div class="upload-hint-text">支持 MP3 · FLAC · OGG · WAV · MP4</div>
+        </el-upload>
+      </div>
     </div>
-    <el-divider />
-    <div class="file-table">
-      <el-table :data="tableData">
-        <el-table-column prop="fileName" label="文件名称" align="center"></el-table-column>
-        <el-table-column prop="type" label="格式" align="center"></el-table-column>
-        <el-table-column label="操作" align="center">
-          <template #default="">
-            <el-button @click="formatChange('mp3')">MP3</el-button>
-            <el-button @click="formatChange('flac')">FLAC</el-button>
-            <el-button @click="formatChange('ogg')">OGG</el-button>
-            <el-button @click="formatChange('wav')">WAV</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+
+    <!-- File table section -->
+    <div class="tool-section" v-if="tableData.length > 0">
+      <div class="section-label">
+        <el-icon><List /></el-icon>
+        文件列表
+      </div>
+      <div class="table-container">
+        <el-table :data="tableData">
+          <el-table-column prop="fileName" label="文件名称" align="left" min-width="200"></el-table-column>
+          <el-table-column prop="type" label="格式" align="center" width="140">
+            <template #default="{ row }">
+              <span class="type-badge">{{ row.type }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="转换格式" align="right" width="300">
+            <template #default="">
+              <div class="format-actions">
+                <el-button class="format-btn" @click="formatChange('mp3')">MP3</el-button>
+                <el-button class="format-btn" @click="formatChange('flac')">FLAC</el-button>
+                <el-button class="format-btn" @click="formatChange('ogg')">OGG</el-button>
+                <el-button class="format-btn" @click="formatChange('wav')">WAV</el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-// Composition API with TypeScript
-import { onMounted, ref, reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus';
-// import { GET_BASE_URL } from '../../utils/URL'
 import type { UploadFile } from 'element-plus';
 import { useAudioStore } from "@/stores/modules/audio"
 import "@/assets/scss/table-style.scss"
+import "@/assets/scss/button-style.scss"
+import "@/assets/scss/upload-zone.scss"
 
-// let URL = GET_BASE_URL() + "/audio/fileFormateTransform"
 const audioStore = useAudioStore()
 const uploadRef = ref();
 let selectedFile = ref<UploadFile>()
-let songInfo = reactive({
-  name: "",
-  type: ""
-})
+let songInfo = reactive({ name: "", type: "" })
 
-interface tableType {
-  fileName: string,
-  type: string
-}
-
+interface tableType { fileName: string, type: string }
 let tableData = reactive<tableType[]>([])
 
-// 选择文件后触发
 function handleFileChange(file: UploadFile) {
-
-  if (!file.raw) {
-    ElMessage.error('无效的文件');
-    return;
-  }
+  if (!file.raw) { ElMessage.error('无效的文件'); return; }
   songInfo.name = file.name.split(".")[0]
   songInfo.type = file.name.split(".")[1]
-
-  let temp = {
-    fileName: file.name,
-    type: file.raw.type
-  }
-  tableData.push(temp)
+  tableData.push({ fileName: file.name, type: file.raw.type })
   selectedFile.value = file;
+}
 
-};
-// 文件转换
 function formatChange(type: string) {
-
-  if (!selectedFile.value?.raw) {
-    ElMessage.error('请先选择文件');
-    return;
-  }
-
+  if (!selectedFile.value?.raw) { ElMessage.error('请先选择文件'); return; }
   const formData = new FormData()
-  console.log(selectedFile.value.raw);
-
   formData.append('file', selectedFile.value.raw)
   formData.append('type', type)
-  // 调用转换格式的API
   audioStore.fileFormatTransform(formData).then(res => {
-
     try {
-      // 1. 创建 blob对象
       const blob = new Blob([res])
-
-      // 2. 创建下载链接
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-
-      // 3. 从后端响应头或前端自定义文件名
-      let fileName = `${songInfo.name}.${type}`; // 默认文件名
-
-      link.download = fileName;
-
-      // 4. 触发点击下载
+      link.download = `${songInfo.name}.${type}`;
       document.body.appendChild(link);
       link.click();
-
-      // 5. 清理
       window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(link);
-
       ElMessage.success('转换完成，正在下载...')
     } catch (error) {
       ElMessage.error('下载失败:' + error)
@@ -120,41 +111,69 @@ function formatChange(type: string) {
   })
 }
 
-// 处理文件移除
-function handleFileRemove() {
-  tableData.pop()
-}
-
-// Lifecycle hook
-onMounted(() => {
-  console.log('Component mounted')
-})
-
-// Methods
+function handleFileRemove() { tableData.pop() }
 </script>
 
 <style scoped lang="scss">
-.Audio-File {
-  position: relative;
-  // width: 100%;
-  display: flex;
-  justify-content: center;
+.audio-tool {
+  max-width: 960px;
 
-  .file-upload-wrap {
-    width: 98%;
-    position: absolute;
+  .tool-header {
+    margin-bottom: 32px;
+
+    .tool-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .tool-desc {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text-muted);
+    }
   }
 
-  .el-divider {
-    width: 98%;
-    position: absolute;
-    top: 28%;
+  .tool-section {
+    margin-bottom: 28px;
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+
+      .el-icon { color: var(--accent); font-size: 13px; }
+    }
   }
 
-  .file-table {
-    width: 98%;
-    position: absolute;
-    top: 34%;
+  .type-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-glow);
+    padding: 3px 12px;
+    border-radius: 50px;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    letter-spacing: 0.05em;
+  }
+
+  .format-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }
 </style>

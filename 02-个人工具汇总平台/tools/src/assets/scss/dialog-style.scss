@@ -1,64 +1,112 @@
+// Obsidian Command — Dark Dialog Styles
 @use "./variable.scss" as vars;
 
+.el-dialog {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(56, 189, 248, 0.08) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
 .el-dialog__header {
-  backdrop-filter: blur(8px);
-  background: #ffffff9f !important;
-  border-radius: 16px 16px 0 0;
+  background: var(--bg-elevated) !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 16px 16px 0 0 !important;
+  padding: 20px 24px !important;
+  margin: 0 !important;
+  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 8%;
-  padding: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--accent) 30%,
+      var(--accent) 70%,
+      transparent 100%
+    );
+    opacity: 0.5;
+  }
 }
 
 .el-dialog__title {
-  line-height: 24px;
-  font-size: 18px;
-  color: #3b3b3b;
+  font-family: var(--font-display) !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  line-height: 1.4;
 }
 
-.el-dialog {
-  background: linear-gradient(to right bottom,
-      #7fffd457,
-      rgba(141, 141, 244, 0.466),
-      #fa807278);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 16px;
-  box-shadow: 0 0 8px #525252b3;
-  padding: 0;
+.el-dialog__headerbtn {
+  top: 18px !important;
+  right: 20px !important;
+
+  .el-dialog__close {
+    color: var(--text-muted) !important;
+    transition: color var(--transition-fast);
+
+    &:hover {
+      color: var(--error) !important;
+    }
+  }
 }
 
 .el-dialog__body {
-  height: 92%;
+  padding: 24px !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-body) !important;
+  line-height: 1.6;
+  height: auto !important;
 }
 
+.el-dialog__footer {
+  padding: 16px 24px 24px !important;
+  border-top: 1px solid var(--border) !important;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Dialog action buttons */
 .el-dialog .ok-btn {
-  background-color: rgb(255, 255, 255);
-  border: 0;
-  box-shadow: 0 0 8px #636363b3;
-  color: grey;
-  transition: .5s all;
+  background: var(--accent) !important;
+  color: var(--bg-deep) !important;
+  border: none !important;
+  border-radius: 50px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  font-family: var(--font-body) !important;
+  transition: all var(--transition-fast) !important;
 
   &:hover {
-    box-shadow: 0 0 8px #525252b3;
-    color: white;
-    transition: .2s all;
-    background-color: vars.$button-color-green;
+    box-shadow: 0 0 20px var(--accent-glow) !important;
+    transform: translateY(-1px) !important;
   }
 }
 
 .el-dialog .cancel-btn {
-  background-color: rgba(255, 255, 255, 0.695);
-  border: 0;
-  box-shadow: 0 0 8px #636363b3;
-  color: grey;
-  transition: .5s all;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50px !important;
+  padding: 10px 24px !important;
+  font-family: var(--font-body) !important;
+  transition: all var(--transition-fast) !important;
 
   &:hover {
-    box-shadow: 0 0 8px #525252b3;
-    color: white;
-    transition: .2s all;
-    background-color: vars.$button-color-red;
+    border-color: var(--error) !important;
+    color: var(--error) !important;
+    background: rgba(248, 113, 113, 0.06) !important;
   }
 }
