@@ -1,2 +1,5 @@
 /toolkitenv
+/.venv
 __pycache__/
+.DS_Store
+.python-version
