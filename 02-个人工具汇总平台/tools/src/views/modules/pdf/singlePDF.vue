@@ -1,58 +1,65 @@
 <template>
   <div class="single-pdf-tool">
 
-    <!-- Upload section -->
-    <div class="tool-section">
-      <div class="section-label">
-        <el-icon><Upload /></el-icon>
-        上传文件
-      </div>
-      <div class="upload-zone-wrapper">
-        <el-upload
-          class="upload-demo"
-          drag
-          ref="uploadRef"
-          :auto-upload="false"
-          :on-change="handleFileChange"
-          :show-file-list="true"
-          :on-remove="handleFileRemove"
-        >
-          <div class="upload-icon-wrap">
-            <el-icon><Document /></el-icon>
+    <div class="bento-grid">
+      <!-- Upload Card -->
+      <div class="bento-card upload-card">
+        <div class="card-icon">
+          <el-icon><Document /></el-icon>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">上传 PDF 文件</h3>
+          <p class="card-desc">支持页面逆序等操作</p>
+          <div class="upload-zone-wrapper">
+            <el-upload
+              class="upload-demo"
+              drag
+              ref="uploadRef"
+              :auto-upload="false"
+              :on-change="handleFileChange"
+              :show-file-list="false"
+              :on-remove="handleFileRemove"
+            >
+              <div class="upload-inner">
+                <div class="upload-icon-bg">
+                  <el-icon><Upload /></el-icon>
+                </div>
+                <div class="upload-text">
+                  <span class="upload-main">拖拽 PDF 到此处</span>
+                  <span class="upload-sub">或点击选择文件</span>
+                </div>
+              </div>
+            </el-upload>
           </div>
-          <div class="upload-main-text">拖拽 PDF 文件到此处 或 <em>点击上传</em></div>
-          <div class="upload-hint-text">支持页面逆序等操作</div>
-        </el-upload>
+        </div>
       </div>
-    </div>
 
-    <!-- File table section -->
-    <div class="tool-section" v-if="tableList.length > 0">
-      <div class="section-label">
-        <el-icon><List /></el-icon>
-        文件信息
+      <!-- File Info Card -->
+      <div v-if="selectedFile" class="bento-card file-card">
+        <div class="card-icon secondary">
+          <el-icon><Files /></el-icon>
+        </div>
+        <div class="file-info">
+          <h4 class="file-name">{{ selectedFile.name }}</h4>
+          <span class="file-type">PDF</span>
+        </div>
+        <button class="reverse-action-btn" @click="reversePage" :disabled="isReversing">
+          <el-icon v-if="isReversing"><Loading /></el-icon>
+          <span>{{ isReversing ? '处理中...' : '页面逆序' }}</span>
+        </button>
       </div>
-      <div class="table-container">
-        <el-table :data="tableList">
-          <el-table-column label="文件名" align="left" min-width="200">
-            <template #default="{ row }">
-              <span class="filename">{{ row.fileName }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="格式" align="center" width="120">
-            <template #default="{ row }">
-              <span class="type-badge">{{ row.type }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="right" width="140">
-            <template #default="">
-              <el-button class="action-btn" @click="reversePage">
-                <el-icon><RefreshRight /></el-icon>
-                逆序
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+
+      <!-- Info Card -->
+      <div v-else class="bento-card info-card">
+        <div class="card-icon tertiary">
+          <el-icon><InfoFilled /></el-icon>
+        </div>
+        <h3 class="card-title">功能说明</h3>
+        <ul class="info-list">
+          <li>页面逆序：将 PDF 页面顺序完全反转</li>
+          <li>保持原有矢量质量不损失</li>
+          <li>支持加密 PDF 文件处理</li>
+        </ul>
       </div>
     </div>
 
@@ -64,26 +71,26 @@ import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus';
 import type { UploadFile } from 'element-plus'
 import { usePDFStore } from '@/stores/modules/pdf';
-import "@/assets/scss/table-style.scss"
-import "@/assets/scss/button-style.scss"
-import "@/assets/scss/upload-zone.scss"
 
 const pdfStore = usePDFStore()
 const uploadRef = ref()
-let selectedFile = ref<UploadFile>()
-
-interface tableType { fileName: string, type: string }
-let tableList = reactive<tableType[]>([])
+const selectedFile = ref<UploadFile | null>(null)
+const isReversing = ref(false)
 
 function handleFileChange(file: UploadFile) {
   if (!file.raw) { ElMessage.error('无效的文件'); return; }
-  let [fileName, type] = file.raw.name.split(".")
-  tableList.push({ fileName, type })
   selectedFile.value = file
+  ElMessage.success(`已添加: ${file.name}`)
+}
+
+function handleFileRemove() {
+  selectedFile.value = null
 }
 
 function reversePage() {
   if (!selectedFile.value?.raw) { ElMessage.error('请先选择文件'); return; }
+  isReversing.value = true
+  const fileName = selectedFile.value.name.replace('.pdf', '')
   let formData = new FormData()
   formData.append("file", selectedFile.value.raw)
   pdfStore.reversePDF(formData).then(res => {
@@ -92,7 +99,7 @@ function reversePage() {
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `${tableList[0].fileName}_reversed.pdf`;
+      link.download = `${fileName}_reversed.pdf`;
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(downloadUrl);
@@ -101,51 +108,214 @@ function reversePage() {
     } catch (error) {
       ElMessage.error('下载失败:' + error)
     }
+  }).finally(() => {
+    isReversing.value = false
   })
 }
-
-function handleFileRemove() { tableList.pop() }
 </script>
 
 <style scoped lang="scss">
 .single-pdf-tool {
-  .tool-section {
-    margin-bottom: 28px;
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+  }
 
-    .section-label {
+  .bento-card {
+    background: var(--md-surface-container-lowest);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: var(--shadow-card);
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--md-primary-container);
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-family: var(--font-body);
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--md-primary);
+      font-size: 26px;
 
-      .el-icon { color: var(--accent); font-size: 13px; }
+      &.secondary {
+        background: var(--md-secondary-container);
+        color: var(--md-on-secondary-container);
+      }
+
+      &.tertiary {
+        background: var(--md-tertiary-container);
+        color: var(--md-on-tertiary-container);
+      }
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--md-on-surface);
+      margin-bottom: 12px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 20px;
     }
   }
 
-  .filename {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-primary);
+  .upload-card {
+    grid-column: span 7;
+    display: flex;
+    gap: 24px;
+
+    .card-content {
+      flex: 1;
+    }
+
+    .upload-zone-wrapper {
+      .upload-demo {
+        :deep(.el-upload-dragger) {
+          padding: 0;
+          border: 2px dashed var(--md-outline-variant);
+          border-radius: 20px;
+          background: var(--md-surface-container-low);
+          transition: all var(--transition-fast);
+
+          &:hover, &.is-dragover {
+            border-color: var(--md-primary);
+            background: var(--md-primary-container);
+          }
+        }
+      }
+
+      .upload-inner {
+        padding: 40px 32px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+
+        .upload-icon-bg {
+          width: 64px;
+          height: 64px;
+          border-radius: 20px;
+          background: var(--md-surface-container-high);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          color: var(--md-primary);
+        }
+
+        .upload-text {
+          text-align: center;
+
+          .upload-main {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--md-on-surface);
+            margin-bottom: 4px;
+          }
+
+          .upload-sub {
+            display: block;
+            font-size: 13px;
+            color: var(--md-on-surface-variant);
+          }
+        }
+      }
+    }
   }
 
-  .type-badge {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent);
-    background: var(--accent-glow);
-    padding: 3px 12px;
-    border-radius: 50px;
-    border: 1px solid rgba(56, 189, 248, 0.25);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+  .file-card {
+    grid-column: span 5;
+    display: flex;
+    flex-direction: column;
+
+    .file-info {
+      flex: 1;
+      margin-bottom: 20px;
+
+      .file-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--md-on-surface);
+        margin-bottom: 12px;
+        word-break: break-all;
+      }
+
+      .file-type {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 12px;
+        background: var(--md-secondary-container);
+        color: var(--md-on-secondary-container);
+        border-radius: 50px;
+      }
+    }
+
+    .reverse-action-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+
+      &:hover:not(:disabled) {
+        background: var(--md-primary-dim);
+        box-shadow: 0 4px 12px rgba(33, 100, 137, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .info-card {
+    grid-column: span 5;
+
+    .info-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      li {
+        position: relative;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--md-on-surface-variant);
+        line-height: 1.6;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 8px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--md-primary);
+        }
+      }
+    }
   }
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <div id="Home">
-    <header class="obsidian-header">
+    <header class="quiet-header">
       <Header></Header>
     </header>
-    <aside class="obsidian-sidebar">
+    <aside class="quiet-sidebar">
       <Side></Side>
     </aside>
-    <main class="obsidian-main">
+    <main class="quiet-main">
       <router-view></router-view>
     </main>
   </div>
@@ -26,64 +26,30 @@ import Side from '../components/common/Side.vue'
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--header-height) 1fr;
   height: 100vh;
-  background-color: var(--bg-deep);
+  background-color: var(--md-background);
   overflow: hidden;
 
-  .obsidian-header {
+  .quiet-header {
     grid-area: header;
-    background-color: var(--bg-card);
-    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--md-outline-variant);
     position: relative;
-    z-index: 10;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        var(--accent) 20%,
-        var(--accent) 80%,
-        transparent 100%
-      );
-      opacity: 0.4;
-    }
+    z-index: 50;
   }
 
-  .obsidian-sidebar {
+  .quiet-sidebar {
     grid-area: sidebar;
-    background-color: var(--bg-card);
-    border-right: 1px solid var(--border);
+    background-color: var(--md-surface-variant);
     overflow-y: auto;
     position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        var(--accent) 30%,
-        var(--accent) 70%,
-        transparent 100%
-      );
-      opacity: 0.35;
-      pointer-events: none;
-    }
   }
 
-  .obsidian-main {
+  .quiet-main {
     grid-area: main;
-    background-color: var(--bg-deep);
-    padding: 28px 32px;
+    background-color: var(--md-background);
+    padding: 32px 40px;
     overflow-y: auto;
     animation: fade-in-up 0.3s ease forwards;
   }
