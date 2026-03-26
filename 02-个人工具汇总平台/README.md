@@ -31,9 +31,13 @@
 
 ### 后端 (`toolsbackend/`)
 - **框架**: FastAPI 0.116
-- **语言**: Python 3
+- **语言**: Python 3.10+
 - **运行**: Uvicorn
-- **依赖**: PyPDF2 (PDF 处理)、pydub (音频处理)、Pydantic v2
+- **依赖**:
+  - `pypdf2` — PDF 合并与逆序
+  - `pydub` — 音频格式转换
+  - `fastapi` / `pydantic` v2 — API 框架
+  - `tortoise-orm` — ORM（当前未启用）
 
 ---
 
@@ -107,6 +111,86 @@ python main.py
 - 所有业务逻辑保持完整，仅 UI 层重新设计
 - 支持拖拽上传文件，转换后自动下载
 - 后端 CORS 完全开放，仅限本地开发使用
+
+---
+
+## 环境依赖
+
+### 必需：FFmpeg（音频功能依赖）
+
+音频转换功能依赖 FFmpeg，请根据系统安装：
+
+**Windows:**
+```bash
+# 使用 chocolatey
+choco install ffmpeg
+
+# 或手动下载：https://www.gyan.dev/ffmpeg/builds/
+# 下载后解压并将 bin 目录添加到系统 PATH
+```
+
+**macOS:**
+```bash
+# 使用 Homebrew（推荐）
+brew install ffmpeg
+
+# 或手动下载：https://ffmpeg.org/download.html#build-mac
+```
+
+**验证安装：**
+```bash
+ffmpeg -version
+```
+
+---
+
+## GitHub 部署流程
+
+### 上传到 GitHub
+
+1. **在 GitHub 创建仓库**（不勾选初始化 README）
+
+2. **本地推送：**
+```bash
+git remote add origin https://github.com/你的用户名/仓库名.git
+git branch -M master
+git push -u origin master
+```
+
+### 新电脑 Clone 部署
+
+```bash
+# 1. Clone 项目
+git clone https://github.com/你的用户名/仓库名.git
+cd 仓库名
+
+# 2. 安装 FFmpeg（见上文环境依赖）
+
+# 3. 前端设置
+cd tools
+npm install
+npm run dev
+
+# 4. 后端设置（新终端）
+cd toolsbackend
+python -m venv toolkitenv
+
+# Windows 激活
+toolkitenv\Scripts\activate
+# macOS/Linux 激活
+source toolkitenv/bin/activate
+
+pip install -r requirements.txt
+python main.py
+```
+
+### 配置注意事项
+
+| 配置项 | 说明 |
+|--------|------|
+| `tools/public/config.json` | 修改 `BASE_URL` 匹配后端实际地址 |
+| `toolsbackend/settings.py` | 如启用数据库，修改 MySQL 连接信息 |
+| 数据库 | 当前 MySQL 功能被注释，无需安装 |
 
 ---
 
