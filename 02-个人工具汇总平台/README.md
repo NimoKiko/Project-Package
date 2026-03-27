@@ -31,8 +31,9 @@
 
 ### 后端 (`toolsbackend/`)
 - **框架**: FastAPI 0.116
-- **语言**: Python 3.10+
+- **语言**: Python 3.11+
 - **运行**: Uvicorn
+- **包管理**: [uv](https://docs.astral.sh/uv/)
 - **依赖**:
   - `pypdf2` — PDF 合并与逆序
   - `pydub` — 音频格式转换
@@ -53,18 +54,32 @@ npm run dev
 
 访问 http://localhost:5173
 
-### 后端启动
+### 后端启动（使用 uv）
 
 ```bash
 cd toolsbackend
 
-# 首次运行需创建虚拟环境
-python -m venv toolkitenv
-source toolkitenv/Scripts/activate  # Windows
-# 或: source toolkitenv/bin/activate  # macOS/Linux
+# 首次运行：创建环境并安装依赖
+uv sync
 
-pip install -r requirements.txt
-python main.py
+# 启动服务
+uv run python main.py
+```
+
+**常用 uv 命令：**
+
+```bash
+# 添加新依赖
+uv add package-name
+
+# 移除依赖
+uv remove package-name
+
+# 更新所有依赖
+uv sync --upgrade
+
+# 仅安装生产依赖（不含 dev）
+uv sync --no-dev
 ```
 
 后端运行在 http://localhost:8000
@@ -97,10 +112,11 @@ python main.py
 │
 └── toolsbackend/             # 后端 FastAPI 项目
     ├── main.py               # 应用入口
-    ├── api/                  # 路由模块
-    │   ├── Audio/
-    │   └── Pdf/
-    └── requirements.txt      # 依赖列表
+    ├── pyproject.toml        # 项目配置与依赖
+    ├── .python-version       # Python 版本指定
+    └── api/                  # 路由模块
+        ├── Audio/
+        └── Pdf/
 ```
 
 ---
@@ -173,15 +189,16 @@ npm run dev
 
 # 4. 后端设置（新终端）
 cd toolsbackend
-python -m venv toolkitenv
 
-# Windows 激活
-toolkitenv\Scripts\activate
-# macOS/Linux 激活
-source toolkitenv/bin/activate
+# 安装 uv（如未安装）
+# Windows: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+# macOS/Linux: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-pip install -r requirements.txt
-python main.py
+# 创建环境并安装依赖
+uv sync
+
+# 启动服务
+uv run python main.py
 ```
 
 ### 配置注意事项

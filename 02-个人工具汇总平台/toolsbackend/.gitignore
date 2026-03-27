@@ -1,5 +1,26 @@
+# Virtual environments
 /toolkitenv
 /.venv
+
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
-.python-version
+Thumbs.db
+
+# Logs
+*.log
+
+# UV
+.uv/
+
+# Backup
+*.bak
