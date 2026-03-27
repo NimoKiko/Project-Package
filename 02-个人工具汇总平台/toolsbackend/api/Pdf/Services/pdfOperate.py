@@ -83,3 +83,44 @@ async def reverse(file: UploadFile = File(...)):
         # 打印异常信息
         print(f"发生异常: {str(e)}")
         raise HTTPException(status_code=500, detail=f"处理PDF时出错: {str(e)}")
+
+
+# 移除PDF权限限制（复制/打印/编辑等）
+async def unlock_pdf_permissions(file: UploadFile):
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="请上传PDF文件")
+
+    try:
+        # 读取文件到内存
+        pdf_content = await file.read()
+
+        # 创建pdf_reader
+        pdf_reader = PdfReader(io.BytesIO(pdf_content))
+
+        # 创建写入器
+        writer = PdfWriter()
+
+        # 如果PDF加密，尝试用空密码解密（绕过权限密码）
+        if pdf_reader.is_encrypted:
+            try:
+                # 空密码可以绕过权限密码限制
+                pdf_reader.decrypt("")
+            except Exception:
+                # 如果解密失败（可能是打开密码保护），仍然尝试继续
+                pass
+
+        # 复制所有页面到新的PDF（不设置加密）
+        for page in pdf_reader.pages:
+            writer.add_page(page)
+
+        # 将解锁后的PDF写入字节流
+        pdf_bytes = io.BytesIO()
+        writer.write(pdf_bytes)
+        pdf_bytes.seek(0)
+
+        return pdf_bytes.getvalue()
+
+    except Exception as e:
+        # 打印异常信息
+        print(f"发生异常: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"处理PDF时出错: {str(e)}")

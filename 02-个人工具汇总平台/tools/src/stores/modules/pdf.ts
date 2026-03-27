@@ -2,7 +2,8 @@
 import { defineStore } from "pinia";
 import {
   mergePdf,
-  reversePdf
+  reversePdf,
+  unlockPdf
 } from "@/api/pdf.ts";
 // import { ElMessage } from "element-plus";
 
@@ -21,6 +22,11 @@ export const usePDFStore = defineStore("PDF", {
     // 按照文件的奇偶数页面 穿插合并文件
     reversePDF(params: any) {
       let p = reversePdf(params)
+      return p
+    },
+    // 移除PDF权限限制
+    unlockPDF(params: any) {
+      let p = unlockPdf(params)
       return p
     },
   },

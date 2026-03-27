@@ -39,3 +39,18 @@ async def reverse_pdf(file: UploadFile = File(...)):
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=merged_output.pdf"}
     )
+
+
+# 移除PDF权限限制 API
+@pdf.post("/unlockPdf")
+async def unlock_pdf_route(file: UploadFile = File(...)):
+    pdf_bytes = await unlock_pdf_permissions(file)
+
+    def iter_file():
+        yield pdf_bytes
+
+    return StreamingResponse(
+        iter_file(),
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=unlocked_output.pdf"}
+    )

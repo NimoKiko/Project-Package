@@ -38,12 +38,27 @@
           <el-icon><ArrowRight /></el-icon>
         </div>
       </div>
+
+      <!-- Unlock Tool Card -->
+      <div class="tool-card" :class="{ active: activeTab === 'unlock' }" @click="activeTab = 'unlock'">
+        <div class="card-icon tertiary">
+          <el-icon><Unlock /></el-icon>
+        </div>
+        <div class="card-info">
+          <h3 class="card-title">权限解锁</h3>
+          <p class="card-desc">移除 PDF 复制打印等限制</p>
+        </div>
+        <div class="card-arrow">
+          <el-icon><ArrowRight /></el-icon>
+        </div>
+      </div>
     </div>
 
     <!-- Tool Content Area -->
     <div class="tool-content">
       <mergePDF v-if="activeTab === 'merge'" />
       <singlePDF v-if="activeTab === 'reverse'" />
+      <unlockPDF v-if="activeTab === 'unlock'" />
     </div>
 
   </div>
@@ -53,6 +68,7 @@
 import { ref } from 'vue'
 import mergePDF from './mergePDF.vue'
 import singlePDF from './singlePDF.vue'
+import unlockPDF from './unlockPDF.vue'
 
 const activeTab = ref('merge')
 </script>
@@ -86,7 +102,7 @@ const activeTab = ref('merge')
   /* Tools Grid */
   .tools-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-bottom: 32px;
   }
@@ -122,6 +138,11 @@ const activeTab = ref('merge')
         color: var(--md-on-secondary);
       }
 
+      .card-icon.tertiary {
+        background: var(--md-tertiary);
+        color: var(--md-on-tertiary);
+      }
+
       .card-title {
         color: var(--md-on-primary-container);
       }
@@ -155,6 +176,11 @@ const activeTab = ref('merge')
       &.secondary {
         background: var(--md-secondary-container);
         color: var(--md-on-secondary-container);
+      }
+
+      &.tertiary {
+        background: var(--md-tertiary-container);
+        color: var(--md-on-tertiary-container);
       }
     }
 
