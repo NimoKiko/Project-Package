@@ -2,9 +2,12 @@
 PDF操作 业务代码
 '''
 import io
+import os
+import tempfile
 from PyPDF2 import PdfReader, PdfWriter
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
+from pdf2docx import Converter
 
 
 # 按照文件的奇偶数页面 穿插合并文件
@@ -124,3 +127,45 @@ async def unlock_pdf_permissions(file: UploadFile):
         # 打印异常信息
         print(f"发生异常: {str(e)}")
         raise HTTPException(status_code=500, detail=f"处理PDF时出错: {str(e)}")
+
+
+# PDF转Word
+async def convert_pdf_to_word(file: UploadFile):
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="请上传PDF文件")
+
+    try:
+        # 读取PDF文件内容到内存
+        pdf_content = await file.read()
+
+        # 创建临时文件用于转换（pdf2docx需要文件路径）
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_pdf:
+            tmp_pdf.write(pdf_content)
+            tmp_pdf_path = tmp_pdf.name
+
+        # 创建临时输出文件
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.docx') as tmp_docx:
+            tmp_docx_path = tmp_docx.name
+
+        try:
+            # 使用pdf2docx进行转换
+            cv = Converter(tmp_pdf_path)
+            cv.convert(tmp_docx_path, start=0, end=None)
+            cv.close()
+
+            # 读取转换后的docx文件
+            with open(tmp_docx_path, 'rb') as f:
+                docx_bytes = f.read()
+
+            return docx_bytes
+
+        finally:
+            # 清理临时文件
+            if os.path.exists(tmp_pdf_path):
+                os.unlink(tmp_pdf_path)
+            if os.path.exists(tmp_docx_path):
+                os.unlink(tmp_docx_path)
+
+    except Exception as e:
+        print(f"PDF转Word发生异常: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"PDF转Word失败: {str(e)}")

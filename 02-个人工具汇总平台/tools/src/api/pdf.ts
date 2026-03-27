@@ -4,7 +4,8 @@ import request from "@/utils/request";
 const API = {
   MERGE_PDF: "/pdf/mergePdf",
   REVERSE_PDF: "/pdf/reversePdf",
-  UNLOCK_PDF: "/pdf/unlockPdf"
+  UNLOCK_PDF: "/pdf/unlockPdf",
+  CONVERT_TO_WORD: "/pdf/convertToWord"
 }
 
 // 按照文件的奇偶数页面 穿插合并文件
@@ -32,6 +33,16 @@ export function unlockPdf(params: any) {
   return request<any, any>({
     method: "POST",
     url: API.UNLOCK_PDF,
+    data: params,
+    responseType: 'blob',
+  });
+}
+
+// PDF转Word
+export function convertToWord(params: any) {
+  return request<any, any>({
+    method: "POST",
+    url: API.CONVERT_TO_WORD,
     data: params,
     responseType: 'blob',
   });

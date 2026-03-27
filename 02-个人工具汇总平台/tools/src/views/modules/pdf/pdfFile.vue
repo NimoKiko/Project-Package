@@ -1,76 +1,98 @@
 <template>
   <div class="pdf-tool">
-
     <!-- Page Header -->
     <div class="page-header">
       <div class="header-content">
         <h1 class="page-title">PDF 处理</h1>
-        <p class="page-desc">合并多个 PDF 文件，或对单个文件进行页面操作</p>
+        <p class="page-desc">专业的 PDF 文件处理工具箱</p>
       </div>
     </div>
 
-    <!-- Tool Cards Grid -->
-    <div class="tools-grid">
-      <!-- Merge Tool Card -->
-      <div class="tool-card" :class="{ active: activeTab === 'merge' }" @click="activeTab = 'merge'">
-        <div class="card-icon primary">
-          <el-icon><DocumentCopy /></el-icon>
-        </div>
-        <div class="card-info">
-          <h3 class="card-title">合并文件</h3>
-          <p class="card-desc">交替页码合并两个 PDF 文档</p>
-        </div>
-        <div class="card-arrow">
-          <el-icon><ArrowRight /></el-icon>
-        </div>
-      </div>
+    <!-- Main Layout: Sidebar + Content -->
+    <div class="pdf-layout">
+      <!-- Left Sidebar: Tool List -->
+      <aside class="tools-sidebar">
+        <nav class="tools-nav">
+          <ul class="tools-list">
+            <li
+              v-for="tool in tools"
+              :key="tool.id"
+              class="tool-item"
+              :class="{ active: activeTool === tool.id }"
+              @click="activeTool = tool.id"
+            >
+              <div class="tool-icon" :class="tool.iconClass">
+                <el-icon>
+                  <component :is="tool.icon" />
+                </el-icon>
+              </div>
+              <div class="tool-info">
+                <h3 class="tool-name">{{ tool.name }}</h3>
+                <p class="tool-desc">{{ tool.desc }}</p>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-      <!-- Reverse Tool Card -->
-      <div class="tool-card" :class="{ active: activeTab === 'reverse' }" @click="activeTab = 'reverse'">
-        <div class="card-icon secondary">
-          <el-icon><RefreshRight /></el-icon>
-        </div>
-        <div class="card-info">
-          <h3 class="card-title">页面逆序</h3>
-          <p class="card-desc">反转 PDF 页面顺序</p>
-        </div>
-        <div class="card-arrow">
-          <el-icon><ArrowRight /></el-icon>
-        </div>
-      </div>
-
-      <!-- Unlock Tool Card -->
-      <div class="tool-card" :class="{ active: activeTab === 'unlock' }" @click="activeTab = 'unlock'">
-        <div class="card-icon tertiary">
-          <el-icon><Unlock /></el-icon>
-        </div>
-        <div class="card-info">
-          <h3 class="card-title">权限解锁</h3>
-          <p class="card-desc">移除 PDF 复制打印等限制</p>
-        </div>
-        <div class="card-arrow">
-          <el-icon><ArrowRight /></el-icon>
-        </div>
-      </div>
+      <!-- Right Content: Tool Interface -->
+      <main class="tool-content">
+        <component :is="currentComponent" />
+      </main>
     </div>
-
-    <!-- Tool Content Area -->
-    <div class="tool-content">
-      <mergePDF v-if="activeTab === 'merge'" />
-      <singlePDF v-if="activeTab === 'reverse'" />
-      <unlockPDF v-if="activeTab === 'unlock'" />
-    </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, markRaw } from 'vue'
+import { DocumentCopy, RefreshRight, Unlock, Document } from '@element-plus/icons-vue'
 import mergePDF from './mergePDF.vue'
 import singlePDF from './singlePDF.vue'
 import unlockPDF from './unlockPDF.vue'
+import convertPDFtoWord from './convertPDFtoWord.vue'
 
-const activeTab = ref('merge')
+// Tool configurations
+const tools = [
+  {
+    id: 'merge',
+    name: '合并文件',
+    desc: '交替页码合并两个 PDF',
+    icon: markRaw(DocumentCopy),
+    iconClass: 'primary',
+    component: markRaw(mergePDF)
+  },
+  {
+    id: 'reverse',
+    name: '页面逆序',
+    desc: '反转 PDF 页面顺序',
+    icon: markRaw(RefreshRight),
+    iconClass: 'secondary',
+    component: markRaw(singlePDF)
+  },
+  {
+    id: 'unlock',
+    name: '权限解锁',
+    desc: '移除复制打印等限制',
+    icon: markRaw(Unlock),
+    iconClass: 'tertiary',
+    component: markRaw(unlockPDF)
+  },
+  {
+    id: 'convertWord',
+    name: '转 Word',
+    desc: 'PDF 转可编辑文档',
+    icon: markRaw(Document),
+    iconClass: 'quaternary',
+    component: markRaw(convertPDFtoWord)
+  }
+]
+
+const activeTool = ref('merge')
+
+const currentComponent = computed(() => {
+  const tool = tools.find(t => t.id === activeTool.value)
+  return tool?.component || mergePDF
+})
 </script>
 
 <style scoped lang="scss">
@@ -79,7 +101,7 @@ const activeTab = ref('merge')
 
   /* Page Header */
   .page-header {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 
     .page-title {
       font-family: var(--font-display);
@@ -99,72 +121,89 @@ const activeTab = ref('merge')
     }
   }
 
-  /* Tools Grid */
-  .tools-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 32px;
+  /* Main Layout */
+  .pdf-layout {
+    display: flex;
+    gap: 24px;
+    min-height: 600px;
   }
 
-  .tool-card {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 24px 28px;
-    background: var(--md-surface-container-lowest);
+  /* Left Sidebar */
+  .tools-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--md-surface-container-low);
     border-radius: 20px;
+    padding: 16px;
     box-shadow: var(--shadow-card);
-    cursor: pointer;
-    transition: all var(--transition-base);
-    border: 2px solid transparent;
 
-    &:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
+    .tools-nav {
+      height: 100%;
     }
 
-    &.active {
-      border-color: var(--md-primary);
-      background: var(--md-primary-container);
-
-      .card-icon.primary {
-        background: var(--md-primary);
-        color: var(--md-on-primary);
-      }
-
-      .card-icon.secondary {
-        background: var(--md-secondary);
-        color: var(--md-on-secondary);
-      }
-
-      .card-icon.tertiary {
-        background: var(--md-tertiary);
-        color: var(--md-on-tertiary);
-      }
-
-      .card-title {
-        color: var(--md-on-primary-container);
-      }
-
-      .card-desc {
-        color: var(--md-on-primary-container);
-        opacity: 0.8;
-      }
-
-      .card-arrow {
-        color: var(--md-primary);
-      }
+    .tools-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .card-icon {
-      width: 56px;
-      height: 56px;
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
       border-radius: 16px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border-left: 3px solid transparent;
+
+      &:hover {
+        background: var(--md-surface-container-high);
+      }
+
+      &.active {
+        background: var(--md-surface-container-highest);
+        border-left-color: var(--md-primary);
+
+        .tool-icon.primary {
+          background: var(--md-primary);
+          color: var(--md-on-primary);
+        }
+
+        .tool-icon.secondary {
+          background: var(--md-secondary);
+          color: var(--md-on-secondary);
+        }
+
+        .tool-icon.tertiary {
+          background: var(--md-tertiary);
+          color: var(--md-on-tertiary);
+        }
+
+        .tool-icon.quaternary {
+          background: #f59e0b;
+          color: #fff;
+        }
+
+        .tool-name {
+          color: var(--md-on-surface);
+        }
+
+        .tool-desc {
+          color: var(--md-on-surface-variant);
+        }
+      }
+    }
+
+    .tool-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 22px;
       flex-shrink: 0;
       transition: all var(--transition-fast);
 
@@ -182,43 +221,51 @@ const activeTab = ref('merge')
         background: var(--md-tertiary-container);
         color: var(--md-on-tertiary-container);
       }
+
+      &.quaternary {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+      }
     }
 
-    .card-info {
+    .tool-info {
       flex: 1;
+      min-width: 0;
 
-      .card-title {
+      .tool-name {
         font-family: var(--font-display);
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 700;
         color: var(--md-on-surface);
         margin-bottom: 4px;
         transition: color var(--transition-fast);
       }
 
-      .card-desc {
-        font-size: 13px;
+      .tool-desc {
+        font-size: 12px;
         color: var(--md-on-surface-variant);
+        line-height: 1.4;
         transition: color var(--transition-fast);
       }
     }
-
-    .card-arrow {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--md-outline);
-      font-size: 20px;
-      transition: all var(--transition-fast);
-    }
   }
 
-  /* Tool Content */
+  /* Right Content */
   .tool-content {
+    flex: 1;
+    min-width: 0;
     animation: fade-in-up 0.3s ease forwards;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>

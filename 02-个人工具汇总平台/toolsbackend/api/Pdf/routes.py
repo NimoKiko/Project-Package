@@ -54,3 +54,18 @@ async def unlock_pdf_route(file: UploadFile = File(...)):
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=unlocked_output.pdf"}
     )
+
+
+# PDF转Word API
+@pdf.post("/convertToWord")
+async def convert_to_word_route(file: UploadFile = File(...)):
+    docx_bytes = await convert_pdf_to_word(file)
+
+    def iter_file():
+        yield docx_bytes
+
+    return StreamingResponse(
+        iter_file(),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": "attachment; filename=converted.docx"}
+    )
