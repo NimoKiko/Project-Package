@@ -12,11 +12,14 @@
 
 | 工具 | 功能描述 |
 |------|---------|
-| **音频转换** | 支持 MP3、FLAC、OGG、WAV、MP4 格式互转 |
-| **PDF 合并** | 将两个 PDF 文件按交替页码合并 |
-| **PDF 逆序** | 将 PDF 页面顺序反转 |
-| **PDF 权限解锁** | 移除 PDF 的复制/打印/编辑限制 |
-| **PDF 转 Word** | 将 PDF 转换为可编辑的 Word 文档 |
+| **音频处理** | |
+| ├─ 格式转换 | 支持 MP3、FLAC、OGG、WAV、MP4 格式互转 |
+| └─ 音频提取 | 从视频文件（MP4/AVI/MOV/MKV/WEBM）中提取音频 |
+| **PDF 处理** | |
+| ├─ PDF 合并 | 将两个 PDF 文件按交替页码合并 |
+| ├─ PDF 逆序 | 将 PDF 页面顺序反转 |
+| ├─ PDF 权限解锁 | 移除 PDF 的复制/打印/编辑限制 |
+| └─ PDF 转 Word | 将 PDF 转换为可编辑的 Word 文档 |
 
 ---
 
@@ -41,6 +44,7 @@
   - `pypdf2` — PDF 合并、逆序、权限解锁
   - `pdf2docx` — PDF 转 Word
   - `pydub` — 音频格式转换
+  - `ffmpeg-python` — 视频音频提取（需系统安装 FFmpeg）
   - `pycryptodome` — PDF 加密处理
   - `fastapi` / `pydantic` v2 — API 框架
   - `tortoise-orm` — ORM（当前未启用）
@@ -110,6 +114,7 @@ uv sync --no-dev
 │   │   ├── components/       # 公共组件 (Header, Side)
 │   │   ├── views/            # 页面视图
 │   │   │   └── modules/      # 工具模块 (音频、PDF)
+│   │   │       ├── audio/    # 音频处理工具（格式转换、音频提取）
 │   │   │       └── pdf/      # PDF 工具（合并、逆序、解锁、转Word）
 │   │   ├── api/              # API 接口封装
 │   │   ├── stores/           # Pinia 状态管理
@@ -131,9 +136,22 @@ uv sync --no-dev
 ## 开发说明
 
 - 前端使用 Element Plus 组件库，但已完全自定义主题样式
-- PDF 模块采用左侧功能列表 + 右侧内容区的可扩展布局
+- **音频/PDF 模块**采用左侧功能列表 + 右侧内容区的可扩展布局（工具箱模式）
 - 支持拖拽上传文件，转换后自动下载
 - 后端 CORS 完全开放，仅限本地开发使用
+
+### 添加新工具模块
+
+参考现有音频/PDF模块的结构：
+
+```
+src/views/modules/yourModule/
+├── yourModule.vue      # 主入口（工具箱布局）
+├── feature1.vue        # 功能1组件
+└── feature2.vue        # 功能2组件
+```
+
+主入口文件使用动态组件切换不同功能，便于扩展。
 
 ---
 
@@ -141,7 +159,7 @@ uv sync --no-dev
 
 ### 必需：FFmpeg（音频功能依赖）
 
-音频转换功能依赖 FFmpeg，请根据系统安装：
+**音频格式转换**和**视频音频提取**功能依赖 FFmpeg，请根据系统安装：
 
 **Windows:**
 ```bash
