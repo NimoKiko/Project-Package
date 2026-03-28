@@ -15,7 +15,7 @@ export const routes = [
       {
         path:'/audio',
         name:'audio',
-        component: () => import("../views/modules/audioFile.vue")
+        component: () => import("../views/modules/audio/audioFile.vue")
       },
       {
         path:'/pdf',

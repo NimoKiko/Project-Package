@@ -17,6 +17,7 @@ dependencies = [
     "aiomysql>=0.2.0",
     "pydantic>=2.11.7",
     "pdf2docx>=0.5.12",
+    "ffmpeg-python>=0.2.0",
 ]
 
 [project.optional-dependencies]

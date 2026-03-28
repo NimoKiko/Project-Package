@@ -1,11 +1,10 @@
 <template>
-  <div class="audio-tool">
-
+  <div class="extract-audio-tool">
     <!-- Page Header -->
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title">音频转换</h1>
-        <p class="page-desc">上传音频文件，一键转换为目标格式并下载</p>
+        <h1 class="page-title">音频提取</h1>
+        <p class="page-desc">上传视频文件，提取其中的音频轨道并下载</p>
       </div>
       <div class="header-stats">
         <div class="stat-card">
@@ -21,11 +20,11 @@
       <!-- Main Upload Card (Large) -->
       <div class="bento-card upload-card">
         <div class="card-icon">
-          <el-icon><Headset /></el-icon>
+          <el-icon><VideoCamera /></el-icon>
         </div>
         <div class="card-content">
-          <h3 class="card-title">上传音频文件</h3>
-          <p class="card-desc">支持 MP3、FLAC、OGG、WAV、MP4 等多种格式</p>
+          <h3 class="card-title">上传视频文件</h3>
+          <p class="card-desc">支持 MP4、AVI、MOV、MKV、WEBM 等多种视频格式</p>
           <div class="upload-zone-wrapper">
             <el-upload
               class="upload-demo"
@@ -35,14 +34,15 @@
               :on-change="handleFileChange"
               :show-file-list="false"
               :on-remove="handleFileRemove"
+              accept=".mp4,.avi,.mov,.mkv,.webm"
             >
               <div class="upload-inner">
                 <div class="upload-icon-bg">
                   <el-icon><Upload /></el-icon>
                 </div>
                 <div class="upload-text">
-                  <span class="upload-main">拖拽文件到此处</span>
-                  <span class="upload-sub">或点击选择文件</span>
+                  <span class="upload-main">拖拽视频到此处</span>
+                  <span class="upload-sub">或点击选择视频文件</span>
                 </div>
               </div>
             </el-upload>
@@ -50,16 +50,16 @@
         </div>
       </div>
 
-      <!-- Quick Format Card -->
+      <!-- Output Format Card -->
       <div class="bento-card format-card">
         <div class="card-icon secondary">
-          <el-icon><RefreshRight /></el-icon>
+          <el-icon><Headset /></el-icon>
         </div>
-        <h3 class="card-title">快速转换</h3>
-        <p class="card-desc">选择目标格式立即开始</p>
+        <h3 class="card-title">输出格式</h3>
+        <p class="card-desc">选择提取的音频格式</p>
         <div class="format-grid">
           <button
-            v-for="fmt in formats"
+            v-for="fmt in audioFormats"
             :key="fmt"
             class="format-btn"
             :class="{ active: selectedFormat === fmt }"
@@ -78,20 +78,20 @@
         <div class="file-info">
           <h4 class="file-name">{{ selectedFile.name }}</h4>
           <div class="file-meta">
-            <span class="file-type">{{ songInfo.type.toUpperCase() }}</span>
+            <span class="file-type">{{ videoInfo.type.toUpperCase() }}</span>
             <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
           </div>
         </div>
-        <button class="convert-action-btn" @click="convertFile" :disabled="isConverting">
-          <el-icon v-if="isConverting"><Loading /></el-icon>
-          <span>{{ isConverting ? '转换中...' : '开始转换' }}</span>
+        <button class="extract-action-btn" @click="extractAudio" :disabled="isExtracting">
+          <el-icon v-if="isExtracting"><Loading /></el-icon>
+          <span>{{ isExtracting ? '提取中...' : '提取音频' }}</span>
         </button>
       </div>
 
       <!-- Recent Activity Card -->
       <div v-if="recentFiles.length > 0" class="bento-card recent-card">
         <div class="card-header">
-          <h3 class="card-title">最近转换</h3>
+          <h3 class="card-title">最近提取</h3>
           <button class="clear-btn" @click="recentFiles = []">
             <el-icon><Delete /></el-icon>
           </button>
@@ -107,7 +107,7 @@
             </div>
             <div class="recent-info">
               <span class="recent-name">{{ file.name }}</span>
-              <span class="recent-detail">{{ file.from }} → {{ file.to }}</span>
+              <span class="recent-detail">{{ file.source }} → {{ file.output }}</span>
             </div>
             <span class="recent-time">{{ file.time }}</span>
           </div>
@@ -130,27 +130,27 @@
           <el-table-column prop="fileName" label="文件名称" align="left" min-width="250">
             <template #default="{ row }">
               <div class="file-cell">
-                <el-icon class="file-cell-icon"><Headset /></el-icon>
+                <el-icon class="file-cell-icon"><VideoCamera /></el-icon>
                 <span class="file-cell-name">{{ row.fileName }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="type" label="当前格式" align="center" width="120">
+          <el-table-column prop="type" label="视频格式" align="center" width="120">
             <template #default="{ row }">
-              <span class="type-badge">{{ row.type }}</span>
+              <span class="type-badge video">{{ row.type }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="转换格式" align="right" width="320">
+          <el-table-column label="提取格式" align="right" width="320">
             <template #default="{ row }">
               <div class="format-actions">
                 <el-button
-                  v-for="fmt in formats"
+                  v-for="fmt in audioFormats"
                   :key="fmt"
                   class="format-action-btn"
                   size="small"
-                  @click="formatChange(row, fmt)"
+                  @click="extractWithFormat(row, fmt)"
                 >
-                  {{ fmt.toUpperCase() }}
+                  提取 {{ fmt.toUpperCase() }}
                 </el-button>
               </div>
             </template>
@@ -171,29 +171,38 @@ import { useAudioStore } from "@/stores/modules/audio"
 const audioStore = useAudioStore()
 const uploadRef = ref();
 const selectedFile = ref<UploadFile | null>(null)
-const isConverting = ref(false)
+const isExtracting = ref(false)
 const selectedFormat = ref('mp3')
 
-const formats = ['mp3', 'flac', 'ogg', 'wav', 'mp4']
+const audioFormats = ['mp3', 'wav', 'flac', 'ogg', 'aac']
+const videoFormats = ['mp4', 'avi', 'mov', 'mkv', 'webm']
 
 interface tableType { fileName: string, type: string, raw?: File }
 let tableData = reactive<tableType[]>([])
 
 interface RecentFile {
   name: string
-  from: string
-  to: string
+  source: string
+  output: string
   time: string
 }
 const recentFiles = reactive<RecentFile[]>([])
 
-let songInfo = reactive({ name: "", type: "" })
+let videoInfo = reactive({ name: "", type: "" })
 
 function handleFileChange(file: UploadFile) {
   if (!file.raw) { ElMessage.error('无效的文件'); return; }
-  songInfo.name = file.name.split(".")[0]
-  songInfo.type = file.name.split(".")[1]
-  tableData.push({ fileName: file.name, type: file.raw.type, raw: file.raw })
+
+  // 检查是否为视频文件
+  const ext = file.name.split(".").pop()?.toLowerCase() || ''
+  if (!videoFormats.includes(ext)) {
+    ElMessage.warning('请选择视频文件格式 (MP4, AVI, MOV, MKV, WEBM)')
+    return
+  }
+
+  videoInfo.name = file.name.split(".")[0]
+  videoInfo.type = ext
+  tableData.push({ fileName: file.name, type: ext, raw: file.raw })
   selectedFile.value = file;
   ElMessage.success(`已添加: ${file.name}`)
 }
@@ -220,32 +229,32 @@ function formatFileSize(bytes?: number): string {
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
-function formatChange(row: tableType, type: string) {
+function extractWithFormat(row: tableType, format: string) {
   if (!row.raw) { ElMessage.error('文件数据无效'); return; }
-  doConversion(row.raw, row.fileName, type);
+  doExtraction(row.raw, row.fileName, format);
 }
 
-function convertFile() {
-  if (!selectedFile.value?.raw) { ElMessage.error('请先选择文件'); return; }
-  doConversion(selectedFile.value.raw, selectedFile.value.name, selectedFormat.value);
+function extractAudio() {
+  if (!selectedFile.value?.raw) { ElMessage.error('请先选择视频文件'); return; }
+  doExtraction(selectedFile.value.raw, selectedFile.value.name, selectedFormat.value);
 }
 
-function doConversion(file: File, fileName: string, targetType: string) {
-  isConverting.value = true;
+function doExtraction(file: File, fileName: string, targetFormat: string) {
+  isExtracting.value = true;
   const name = fileName.split(".")[0];
-  const fromType = fileName.split(".")[1];
+  const sourceType = fileName.split(".").pop() || 'video';
 
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('type', targetType)
+  formData.append('type', targetFormat)
 
-  audioStore.fileFormatTransform(formData).then(res => {
+  audioStore.extractAudio(formData).then(res => {
     try {
       const blob = new Blob([res])
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `${name}.${targetType}`;
+      link.download = `${name}_audio.${targetFormat}`;
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(downloadUrl);
@@ -253,27 +262,27 @@ function doConversion(file: File, fileName: string, targetType: string) {
 
       // Add to recent
       recentFiles.unshift({
-        name: `${name}.${targetType}`,
-        from: fromType.toUpperCase(),
-        to: targetType.toUpperCase(),
+        name: `${name}_audio.${targetFormat}`,
+        source: sourceType.toUpperCase(),
+        output: targetFormat.toUpperCase(),
         time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
       });
       if (recentFiles.length > 5) recentFiles.pop();
 
-      ElMessage.success('转换完成，正在下载...')
+      ElMessage.success('音频提取完成，正在下载...')
     } catch (error) {
       ElMessage.error('下载失败:' + error)
     }
+  }).catch(err => {
+    ElMessage.error('提取失败: ' + (err.message || '未知错误'))
   }).finally(() => {
-    isConverting.value = false;
+    isExtracting.value = false;
   })
 }
 </script>
 
 <style scoped lang="scss">
-.audio-tool {
-  max-width: 1200px;
-
+.extract-audio-tool {
   /* Page Header */
   .page-header {
     display: flex;
@@ -285,7 +294,7 @@ function doConversion(file: File, fileName: string, targetType: string) {
     .header-content {
       .page-title {
         font-family: var(--font-display);
-        font-size: 40px;
+        font-size: 32px;
         font-weight: 800;
         color: var(--md-on-background);
         letter-spacing: -0.03em;
@@ -303,7 +312,7 @@ function doConversion(file: File, fileName: string, targetType: string) {
 
     .header-stats {
       .stat-card {
-        background: var(--md-primary-container);
+        background: var(--md-secondary-container);
         padding: 16px 24px;
         border-radius: 16px;
         display: flex;
@@ -317,14 +326,14 @@ function doConversion(file: File, fileName: string, targetType: string) {
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          color: var(--md-on-primary-container);
+          color: var(--md-on-secondary-container);
           opacity: 0.8;
         }
 
         .stat-value {
           font-size: 28px;
           font-weight: 800;
-          color: var(--md-primary);
+          color: var(--md-secondary);
           line-height: 1;
         }
       }
@@ -485,9 +494,9 @@ function doConversion(file: File, fileName: string, targetType: string) {
         }
 
         &.active {
-          background: var(--md-primary);
-          color: var(--md-on-primary);
-          border-color: var(--md-primary);
+          background: var(--md-secondary);
+          color: var(--md-on-secondary);
+          border-color: var(--md-secondary);
         }
       }
     }
@@ -533,11 +542,11 @@ function doConversion(file: File, fileName: string, targetType: string) {
       }
     }
 
-    .convert-action-btn {
+    .extract-action-btn {
       width: 100%;
       padding: 14px 24px;
-      background: var(--md-primary);
-      color: var(--md-on-primary);
+      background: var(--md-secondary);
+      color: var(--md-on-secondary);
       border: none;
       border-radius: 50px;
       font-family: var(--font-body);
@@ -551,8 +560,8 @@ function doConversion(file: File, fileName: string, targetType: string) {
       transition: all var(--transition-fast);
 
       &:hover:not(:disabled) {
-        background: var(--md-primary-dim);
-        box-shadow: 0 4px 12px rgba(33, 100, 137, 0.3);
+        background: var(--md-secondary-dim);
+        box-shadow: 0 4px 12px rgba(100, 100, 100, 0.3);
       }
 
       &:disabled {
@@ -613,8 +622,8 @@ function doConversion(file: File, fileName: string, targetType: string) {
           width: 32px;
           height: 32px;
           border-radius: 10px;
-          background: var(--md-primary-container);
-          color: var(--md-primary);
+          background: var(--md-secondary-container);
+          color: var(--md-secondary);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -703,8 +712,8 @@ function doConversion(file: File, fileName: string, targetType: string) {
           width: 36px;
           height: 36px;
           border-radius: 10px;
-          background: var(--md-primary-container);
-          color: var(--md-primary);
+          background: var(--md-secondary-container);
+          color: var(--md-secondary);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -722,11 +731,16 @@ function doConversion(file: File, fileName: string, targetType: string) {
         font-family: var(--font-mono);
         font-size: 11px;
         font-weight: 600;
-        color: var(--md-primary);
-        background: var(--md-primary-container);
+        color: var(--md-secondary);
+        background: var(--md-secondary-container);
         padding: 4px 12px;
         border-radius: 50px;
         letter-spacing: 0.02em;
+
+        &.video {
+          color: var(--md-tertiary);
+          background: var(--md-tertiary-container);
+        }
       }
 
       .format-actions {
@@ -746,8 +760,8 @@ function doConversion(file: File, fileName: string, targetType: string) {
           border: none;
 
           &:hover {
-            background: var(--md-primary);
-            color: var(--md-on-primary);
+            background: var(--md-secondary);
+            color: var(--md-on-secondary);
           }
         }
       }
