@@ -89,7 +89,7 @@ const uploadRef = ref()
 const isMerging = ref(false)
 const files = reactive<UploadFile[]>([])
 
-function handleFileChange(file: UploadFile, fileList: UploadFile[]) {
+function handleFileChange(_file: UploadFile, fileList: UploadFile[]) {
   files.splice(0, files.length, ...fileList)
   if (files.length === 2) {
     ElMessage.success('文件已就绪，可以开始合并')
